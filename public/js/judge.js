@@ -1,17 +1,13 @@
-var WAIT_TIME = 60;
-var count = 0;
 var N = 0;
-
 var now_id;
-
 //a check interval
 var c;
+reset_timer('seconds');
 
 $(document).ready(function () {
     $('i').css('display', 'none');
     var socket = io('http://localhost:3000/');
     socket.on('connect', function () {
-        console.log(socket.id);
         now_id = socket.id;
     })
     show_log();
@@ -19,13 +15,11 @@ $(document).ready(function () {
         judger_login(socket);
     })
     socket.on('judge_login_sucess', function (id) {
-        console.log('get');
         chose_score();
         socket.emit('add_judge');
         show_judge();
     })
     socket.on('judge_login_fail', function () {
-        console.log('fail');
         alert('手机账号错误或权限不足')
     })
     socket.on('begin', () => {
@@ -34,25 +28,14 @@ $(document).ready(function () {
     })
 
     socket.on('next', () => {
-        console.log('next');
         $('svg').css('display', 'none');
-        WAIT_TIME = 60;
-        timer = function () {
-            setTimeout(() => {
-                if (WAIT_TIME) {
-                    --WAIT_TIME;
-                    $('#seconds').text(WAIT_TIME);
-                    timer();
-                } else { }
-            }, 1000);
-        }
-        $('#seconds').text(60);
+        reset_timer('seconds');
+        $('#seconds').text(WAIT_TIME);
         $('#commit_btn').attr("disabled", true);
     })
 
     $('#commit_btn').click((e) => {
         let result = judge_result();
-        console.log(result);
         var data = {
             'score': result,
             'id': now_id
@@ -85,10 +68,8 @@ function chose_score() {
 function check() {
     var $array = $('.score').find('.marked');
     var array = Array.prototype.slice.call($array);
-    // console.log(array);
     var n = array.length;
     N = n;
-    // console.log(n);
     if (n >= 5) {
         $('#commit_btn').attr("disabled", false);
     } else {
@@ -96,10 +77,8 @@ function check() {
     }
     if (N >= 5) {
         clearInterval(c);
-        // judge_result();
         $('#commit_btn').click(judge_result);
     }
-
     if (WAIT_TIME === 0) {
         $('#commit_btn').trigger('click');
         clearInterval(c);
@@ -126,7 +105,8 @@ function judge_result() {
                 break;
         }
     })
-    timer = () => { };
+    clear_timer();
+    //Timeout without marking
     if (WAIT_TIME === 0) {
         return [0, 0, 0, 0, 0];
     }
@@ -136,14 +116,4 @@ function judge_result() {
 function judger_login(socket) {
     var phone_number = $('#login-area input').val();
     socket.emit('check_judge_login', phone_number);
-}
-
-var timer = function () {
-    setTimeout(() => {
-        if (WAIT_TIME) {
-            --WAIT_TIME;
-            $('#seconds').text(WAIT_TIME);
-            timer();
-        } else { }
-    }, 1000);
 }

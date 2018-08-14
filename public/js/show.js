@@ -1,25 +1,21 @@
-var id_list = [];
-var groups_info = [];
-var curren_group = 0;
-WAIT_TIME = 60;
+//a check interval
+var Interval;
+
+reset_timer('timer_count span');
 
 $(document).ready(function () {
     $('#projects .project h1').text('等待评委登陆......');
     $('.my-nav button').attr('disabled', true);
     var socket = io();
     socket.on('add_judge', function (id) {
-        // alert(2);
-        console.log(id);
-        console.log(id_list.indexOf(id));
         if (id_list.indexOf(id) === -1) {
             add_judge(id);
             id_list.push(id);
-            if (id_list.length >= 2) {
+            if (id_list.length >= JUDGE_AMOUNT) {
                 $('#projects .project h1').text('所有评委等待就绪');
                 button_switch('init')
             }
         }
-        // console.log(id_list);
     })
 
     socket.on('groups_info', function (groups) {
@@ -30,7 +26,6 @@ $(document).ready(function () {
     })
 
     socket.on('fill_score', (data) => {
-        console.log(data);
         fill_score(data.id, data.score);
     })
 
@@ -39,40 +34,33 @@ $(document).ready(function () {
     })
     $('#begin').click((e) => {
         socket.emit('begin');
-        WAIT_TIME = 60;
-        timer = function () {
-            setTimeout(() => {
-                if (WAIT_TIME) {
-                    --WAIT_TIME;
-                    $('#timer_count span').text(WAIT_TIME);
-                    timer();
-                } else { }
-            }, 1000);
-        }
+        reset_timer('timer_count span');
         timer();
+        Interval = setInterval(check_timeout,1000);
         button_switch('done');
     })
     $('#done').click((e) => {
-        timer = () => { };
+        clear_timer();
         show_total();
         calcu_total();
         button_switch('next');
     })
     $('#next').click((e) => {
         if (curren_group === groups_info.length) {
+            WAIT_TIME = 60;
+            clearInterval(Interval);
             button_switch('end');
         } else {
             groups_switch(groups_info, curren_group);
+            WAIT_TIME = 60;
             all_zero();
             button_switch('begin');
+            socket.emit('next');
         }
-        socket.emit('next');
     })
 })
 
 function add_judge(id) {
-    // alert(id);
-    var count = 1;
     var $judge = $('<div id="' + id + '" class="judge"></div>');
     var $list_group = $('<ul class="list-group"></ul>');
     var $head = $('<li id="head" class="list-group-item list-group-item-success head">' + id.slice(0, 5) + '</li>');
@@ -115,21 +103,12 @@ function fill_score(id, score) {
     }
 }
 
-var timer = function () {
-    setTimeout(() => {
-        if (WAIT_TIME) {
-            --WAIT_TIME;
-            $('#timer_count span').text(WAIT_TIME);
-            timer();
-        } else { }
-    }, 1000);
-}
-
 function check_timeout() {
+    console.log(1)
     if (WAIT_TIME) {
     } else {
         $('#done').trigger('click');
-        timer = () => { };
+        clear_timer();
     }
 }
 
@@ -142,8 +121,6 @@ function show_total() {
         for (var j = 0; j < $span.length - 1; j++) {
             score.push($($span[j]).text());
         }
-        console.log(divide);
-        console.log(score);
         var res = calcu_pre_total(divide, score);
         $($span[$span.length - 1]).text(res);
     }
@@ -165,13 +142,11 @@ function calcu_total() {
         result.push($($arry[i]).text());
         sum += parseInt(($($arry[i]).text()));
     }
-
-    console.log(result);
     $('#projects .score h1').text((sum / result.length).toFixed(2));
 }
 
 function all_zero() {
-    $('#timer_count span').text(60);
+    $('#timer_count span').text(WAIT_TIME);
     $('#projects .score h1').text(0);
     $('.judge span').text(0);
 }

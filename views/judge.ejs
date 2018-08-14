@@ -106,9 +106,11 @@
         </div>
         <button id="commit_btn" class="btn btn-primary btn-block" type="submit" disabled>评分</button>
         <div id="timer">
-            <span id="seconds">60</span>
+            <span id="seconds"><%= data.WAIT_TIME %></span>
         </div>
     </div>
-
+    
+    <script src="js/data.js"></script>
+    <script src="js/timer.js"></script>
     <script src="js/judge.js"></script>
     <%- include('./components/footer') %>

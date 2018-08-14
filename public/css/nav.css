@@ -10,8 +10,7 @@
 .my-nav button:nth-child(1) {
   margin-left: 20px;
 }
-
-#timer_count{
+#timer_count {
   color: white;
   text-align: right;
   font-size: 2em;

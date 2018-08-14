@@ -1,0 +1,19 @@
+.entry a,
+.entry a:link,
+.entry a:visited,
+.entry a:hover,
+.entry a:active {
+  text-decoration: none;
+  color: inherit;
+}
+.entry a:hover {
+  font-weight: bold;
+}
+.entry {
+  margin: 5% auto;
+  border: 2px solid #ccc;
+  width: 400px;
+}
+.entry .title a {
+  text-align: center;
+}

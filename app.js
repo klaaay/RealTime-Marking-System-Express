@@ -46,42 +46,13 @@ app.get('/', function (req, res, next) {
   res.render('index')
 })
 
-// app.post('/', function (req, res, next) {
-//   var name = req.fields.name;
-//   var password = req.fields.password;
-//   if (req.fields.role === 'admin') {
-//     try {
-//       if (!name.length) {
-//         throw new Error('请填写用户名')
-//       }
-//       if (!password.length) {
-//         throw new Error('请填写密码')
-//       }
-//     } catch (e) {
-//       req.flash('error', e.message)
-//       return res.redirect('back')
-//     }
-//     data_func.validate_admin(req, res, name, password);
-//   }
-//   if (req.fields.role === 'viewer') {
-//     res.redirect('/show')
-//   }
-//   if (req.fields.role === 'judge') {
-//     var phonenumber = req.fields.phonenumber;
-//     data_func.validate_judge(req, res, phonenumber);
-//   }
-// })
-
 app.get('/judge', function (req, res, next) {
   res.render('judge');
 })
 
-
 app.get('/show', function (req, res, next) {
   res.render('show');
 })
-
-
 
 app.use(function (err, req, res, next) {
   req.flash('error', err.message)

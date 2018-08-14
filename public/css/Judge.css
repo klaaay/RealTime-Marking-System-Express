@@ -1,7 +1,6 @@
 body {
   background-color: #F7F7F9;
 }
-
 #login-area {
   position: absolute;
   top: -60px;
@@ -16,11 +15,9 @@ body {
   border-radius: 15px;
   box-shadow: 0 0 2px #ccc;
 }
-
-#login-area button{
+#login-area button {
   width: 100%;
 }
-
 #score-area {
   position: absolute;
   top: 0;

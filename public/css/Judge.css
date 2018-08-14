@@ -1,0 +1,80 @@
+body {
+  background-color: #F7F7F9;
+}
+
+#login-area {
+  position: absolute;
+  top: -60px;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto;
+  width: 400px;
+  height: 170px;
+  border: 2px solid #E7E7E7;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 2px #ccc;
+}
+
+#login-area button{
+  width: 100%;
+}
+
+#score-area {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 600px;
+  height: 403px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  padding-top: 30px;
+}
+#score-area p {
+  font-size: 1.5em;
+  padding-left: 50px;
+  background-color: #ccc;
+}
+#score-area .score {
+  display: flex;
+  text-align: center;
+  font-size: 1.3em;
+}
+#score-area .zero {
+  color: #D9544F;
+  flex-basis: 25%;
+}
+#score-area .sixty {
+  color: #EFAD4D;
+  flex-basis: 25%;
+}
+#score-area .eighty {
+  color: #418BCA;
+  flex-basis: 25%;
+}
+#score-area .hundred {
+  color: #5BB85D;
+  flex-basis: 25%;
+}
+#timer {
+  width: 100px;
+  height: 100px;
+  border: 1px solid #5BC0DE;
+  background-color: #5BC0DE;
+  border-radius: 100%;
+  text-align: center;
+  font-size: 2em;
+  position: relative;
+  top: -440px;
+  left: 535px;
+}
+#timer span {
+  display: inline-block;
+  font-weight: bold;
+  margin-top: 25px;
+  color: white;
+}

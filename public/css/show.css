@@ -1,0 +1,40 @@
+#projects {
+  display: flex;
+}
+#projects .project {
+  flex-basis: 80%;
+  margin-bottom: 0;
+}
+#projects .project h1,
+#projects .project p {
+  margin-left: 20px;
+}
+#projects .score {
+  flex-basis: 20%;
+  height: 239px;
+  background-color: #EEEEEE;
+  display: flex;
+  justify-content: center;
+}
+#projects .score h1 {
+  align-self: center;
+  font-size: 6em;
+}
+#judges {
+  display: flex;
+  font-size: 1.5em;
+}
+#judges .judge {
+  margin-top: 5px;
+  margin-left: 50px;
+  width: 200px;
+}
+#judges .judge .head {
+  text-align: center;
+  font-weight: bold;
+}
+#judges .judge span {
+  font-size: 1em;
+  background-color: #D9EDF7;
+  color: #337AB7;
+}

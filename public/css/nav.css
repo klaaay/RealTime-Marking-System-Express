@@ -1,0 +1,18 @@
+.my-nav {
+  background: lightblue;
+  width: 100%;
+  margin: 0;
+}
+.my-nav button {
+  width: 100%;
+  margin: 5px;
+}
+.my-nav button:nth-child(1) {
+  margin-left: 20px;
+}
+
+#timer_count{
+  color: white;
+  text-align: right;
+  font-size: 2em;
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <%- include('./components/header') %>
+        <link rel="stylesheet" href="css/judge.css">
+</head>
+
+<body>
+    <div id="login-area">
+        <div class="field">
+            <label class="label">手机号</label>
+            <div class="control has-icons-left has-icons-right">
+                <input class="input is-success" type="text" placeholder="请输入你的手机号" value="">
+                <span class="icon is-small is-left">
+                    <i class="fas fa-user"></i>
+                </span>
+                <span class="icon is-small is-right">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column is-one-quarter"></div>
+            <div class="column">
+                <button class="button is-success login">登陆</button>
+            </div>
+            <div class="column is-one-quarter"></div>
+        </div>
+    </div>
+    <div id="score-area">
+        <p>答辩</p>
+        <div class="score">
+            <div class="zero">0分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="sixty">60分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="eighty">80分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="hundred">100分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+        </div>
+        <p>界面</p>
+        <div class="score">
+            <div class="zero">0分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="sixty">60分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="eighty">80分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="hundred">100分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+        </div>
+        <p>功能</p>
+        <div class="score">
+            <div class="zero">0分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="sixty">60分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="eighty">80分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="hundred">100分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+        </div>
+        <p>代码</p>
+        <div class="score">
+            <div class="zero">0分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="sixty">60分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="eighty">80分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="hundred">100分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+        </div>
+        <p>团队</p>
+        <div class="score">
+            <div class="zero">0分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="sixty">60分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="eighty">80分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="hundred">100分
+                <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+        </div>
+        <button id="commit_btn" class="btn btn-primary btn-block" type="submit" disabled>评分</button>
+        <div id="timer">
+            <span id="seconds">60</span>
+        </div>
+    </div>
+
+    <script src="js/judge.js"></script>
+    <%- include('./components/footer') %>

@@ -1,0 +1,8 @@
+# Ignore everything in this directory
+node_modules
+routes
+models
+middlewares
+lib
+# Except this file
+!.gitignore

@@ -1,49 +1,61 @@
 var N = 0;
+var Now_phone;
 var now_id;
 //a check interval
 var c;
+init_wait_time()
 reset_timer('seconds');
 
 $(document).ready(function () {
+    show_log();
     $('i').css('display', 'none');
+    $('.notification').css('display','none');
+    $('body').on('click','.notification button',function(){
+        $('.notification').css('display','none');
+    })
+    
     var socket = io('http://localhost:3000/');
     socket.on('connect', function () {
         now_id = socket.id;
     })
-    show_log();
-    $('#login-area .login').click(function (e) {
-        judger_login(socket);
-    })
-    socket.on('judge_login_sucess', function (id) {
+    //?
+    // socket.on('disconnect',function(){
+    //     console.log('a user disconnected');
+    //     console.log(socket.id);
+    // })
+    socket.on('judge_login_sucess', function (now_phone) {
+        Now_phone = now_phone;
+        $('.notification').css('display','none');
         chose_score();
-        socket.emit('add_judge');
+        socket.emit('add_judge',Now_phone);
         show_judge();
     })
-    socket.on('judge_login_fail', function () {
-        alert('手机账号错误或权限不足')
+    socket.on('judge_login_fail', function (message) {
+        show_fail_message(message);
     })
     socket.on('begin', () => {
         c = setInterval(check, 500);
         timer();
     })
-
     socket.on('next', () => {
         $('svg').css('display', 'none');
+        init_wait_time()
         reset_timer('seconds');
         $('#seconds').text(WAIT_TIME);
         $('#commit_btn').attr("disabled", true);
     })
 
+    $('#login-area .login').click(function (e) {
+        judger_login(socket);
+    })
     $('#commit_btn').click((e) => {
         let result = judge_result();
         var data = {
             'score': result,
-            'id': now_id
+            'phone': Now_phone
         }
         socket.emit('fill_score', data);
     })
-
-
 })
 
 function show_log() {
@@ -116,4 +128,9 @@ function judge_result() {
 function judger_login(socket) {
     var phone_number = $('#login-area input').val();
     socket.emit('check_judge_login', phone_number);
+}
+
+function show_fail_message(message){
+    $('.notification ').css('display','flex');
+    $('.notification span').text(message);
 }

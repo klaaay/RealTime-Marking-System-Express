@@ -1,3 +1,3 @@
 module.exports = {
-  'WAIT_TIME':60
+  'WAIT_TIME':120
 }

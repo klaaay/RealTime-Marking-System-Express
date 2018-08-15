@@ -21,18 +21,21 @@ app.get('/', function (req, res, next) {
 })
 
 app.get('/judge', function (req, res, next) {
-  res.render('judge',{data:data});
+  res.render('judge', { data: data });
 })
 
 app.get('/show', function (req, res, next) {
-  res.render('show',{data:data});
+  res.render('show', { data: data });
 })
+
 
 io.on('connection', function (socket) {
   console.log('a user connected');
   console.log(socket.id);
   socket.on('disconnect', function () {
+    console.log(socket.id);
     console.log('a user disconnected');
+    io.emit('judge_leave', socket.id);
   })
   socket.on('check_judge_login', function (phone_number) {
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
@@ -40,32 +43,58 @@ io.on('connection', function (socket) {
       var where = { 'phone_number': phone_number };
       dbo.collection('judges').find(where).toArray(function (err, result) {
         if (result.length !== 0) {
-          socket.emit('judge_login_sucess',socket.id);
+          if (!result[0].state) {
+            socket.emit('judge_login_sucess', result[0].phone_number);
+            dbo.collection("judges").updateOne({ "state": false }, { $set: { "state": true } }, function (err, res) {
+              if (err) throw err;
+              console.log("文档更新成功");
+              db.close();
+            });
+          } else {
+            socket.emit('judge_login_fail', "该手机号已登录");
+            db.close();
+          }
         } else {
-          socket.emit('judge_login_fail');
+          socket.emit('judge_login_fail', "该手机账号不存在");
+          db.close();
         }
       })
     })
   })
-  socket.on('add_judge', function () {
-    io.emit('add_judge', socket.id);
+  socket.on('add_judge', function (Now_phone) {
+    let data = {
+      'id': socket.id,
+      'phone': Now_phone
+    }
+    io.emit('add_judge', data);
   })
-  socket.on('init',()=>{
-    MongoClient.connect(url,{ useNewUrlParser:true},function(err,db){
+  socket.on('init', () => {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
       var dbo = db.db('judge');
-      dbo.collection('groups').find({}).toArray(function(err,groups){
-        io.emit('groups_info',groups);
+      dbo.collection('groups').find({}).toArray(function (err, groups) {
+        io.emit('groups_info', groups);
       })
     })
   })
-  socket.on('begin',()=>{
+  socket.on('begin', () => {
     io.emit('begin');
   })
-  socket.on('fill_score',(data)=>{
-    io.emit('fill_score',data);
+  socket.on('fill_score', (data) => {
+    io.emit('fill_score', data);
   })
-  socket.on('next',()=>{
+  socket.on('next', () => {
     io.emit('next');
+  })
+
+  socket.on('change_judge_state', (phone) => {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
+      var dbo = db.db('judge');
+      dbo.collection('judges').updateOne({ "phone_number": phone }, { $set: { "state": false } }, (err, res) => {
+        if (err) throw err;
+        console.log("set false success");
+        db.close();
+      })
+    })
   })
 })
 

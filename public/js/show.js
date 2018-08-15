@@ -1,32 +1,41 @@
 //a check interval
 var Interval;
-
+init_wait_time()
 reset_timer('timer_count span');
 
 $(document).ready(function () {
+
     $('#projects .project h1').text('等待评委登陆......');
     $('.my-nav button').attr('disabled', true);
+
     var socket = io();
-    socket.on('add_judge', function (id) {
-        if (id_list.indexOf(id) === -1) {
-            add_judge(id);
-            id_list.push(id);
-            if (id_list.length >= JUDGE_AMOUNT) {
+    socket.on('add_judge', function (data) {
+        if (phone_list.indexOf(data.phone) === -1) {
+            add_judge(data.phone, data.id);
+            phone_list.push(data.phone);
+            user_list[((data.phone).toString())] = data.id;
+            // console.log(phone_list);
+            // console.log(user_list);
+            if (phone_list.length >= JUDGE_AMOUNT) {
                 $('#projects .project h1').text('所有评委等待就绪');
                 button_switch('init')
             }
         }
     })
-
     socket.on('groups_info', function (groups) {
         groups_info = groups;
         $('#projects .score h1').text('0');
         groups_switch(groups_info, curren_group);
         button_switch('begin');
     })
-
     socket.on('fill_score', (data) => {
-        fill_score(data.id, data.score);
+        fill_score(data.phone, data.score);
+    })
+    socket.on('judge_leave', (id) => {
+        var leave_phone = find_key(id);
+        phone_list.splice(phone_list.indexOf(leave_phone), 1);
+        socket.emit('change_judge_state', leave_phone);
+        remove_judge(id);
     })
 
     $('#init').click((e) => {
@@ -34,9 +43,10 @@ $(document).ready(function () {
     })
     $('#begin').click((e) => {
         socket.emit('begin');
+        init_wait_time()
         reset_timer('timer_count span');
         timer();
-        Interval = setInterval(check_timeout,1000);
+        Interval = setInterval(check_timeout, 1000);
         button_switch('done');
     })
     $('#done').click((e) => {
@@ -47,12 +57,12 @@ $(document).ready(function () {
     })
     $('#next').click((e) => {
         if (curren_group === groups_info.length) {
-            WAIT_TIME = 60;
+            init_wait_time();
             clearInterval(Interval);
             button_switch('end');
         } else {
             groups_switch(groups_info, curren_group);
-            WAIT_TIME = 60;
+            init_wait_time();
             all_zero();
             button_switch('begin');
             socket.emit('next');
@@ -60,8 +70,8 @@ $(document).ready(function () {
     })
 })
 
-function add_judge(id) {
-    var $judge = $('<div id="' + id + '" class="judge"></div>');
+function add_judge(now_phone, id) {
+    var $judge = $('<div id="' + now_phone + '" class="judge ' + id + '"></div>');
     var $list_group = $('<ul class="list-group"></ul>');
     var $head = $('<li id="head" class="list-group-item list-group-item-success head">' + id.slice(0, 5) + '</li>');
     var $live = $('<li class="list-group-item"><span class="badge">0</span>答辩</li>');
@@ -81,6 +91,10 @@ function add_judge(id) {
     $('#judges').append($judge);
 }
 
+function remove_judge(id) {
+    $('.' + id).remove();
+}
+
 function button_switch(name) {
     $('.my-nav button').attr('disabled', true);
     $('#' + name).attr('disabled', false);
@@ -96,14 +110,15 @@ function groups_switch(groups, index) {
     curren_group = curren_group + 1;
 }
 
-function fill_score(id, score) {
-    var $arry = $('#' + id).find('ul span');
+function fill_score(phone, score) {
+    var $arry = $('#' + phone).find('ul span');
     for (var i = 0; i < $arry.length - 1; i++) {
         $($arry[i]).text(score[i]);
     }
 }
 
 function check_timeout() {
+    //?
     console.log(1)
     if (WAIT_TIME) {
     } else {
@@ -113,7 +128,6 @@ function check_timeout() {
 }
 
 function show_total() {
-    var divide = [0.2, 0.2, 0.2, 0.2, 0.2];
     var $arry = $('.judge');
     for (var i = 0; i < $arry.length; i++) {
         var $span = $($arry[i]).find('span');
@@ -149,4 +163,13 @@ function all_zero() {
     $('#timer_count span').text(WAIT_TIME);
     $('#projects .score h1').text(0);
     $('.judge span').text(0);
+}
+
+function find_key(id) {
+    for (var i = 0; i < phone_list.length; i++) {
+        if (user_list[phone_list[i]] == id) {
+            return phone_list[i];
+        }
+    }
+    return -1;
 }

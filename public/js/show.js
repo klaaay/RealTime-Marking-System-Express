@@ -57,6 +57,7 @@ $(document).ready(function () {
     })
     $('#done').click((e) => {
         clear_timer();
+        CONTINUE = 1;
         show_total();
         calcu_total();
         button_switch('next');

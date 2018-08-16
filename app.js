@@ -2,7 +2,8 @@ const path = require('path')
 const express = require('express')
 const pkg = require('./package')
 const app = express()
-const data = require('./config/data.js');
+const routes = require('./routes');
+
 
 const server = require('http').createServer(app);
 var io = require('socket.io')(server);
@@ -16,18 +17,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.get('/', function (req, res, next) {
-  res.render('index')
-})
-
-app.get('/judge', function (req, res, next) {
-  res.render('judge', { data: data });
-})
-
-app.get('/show', function (req, res, next) {
-  res.render('show', { data: data });
-})
-
+routes(app);
 
 io.on('connection', function (socket) {
   console.log('a user connected');
@@ -76,13 +66,15 @@ io.on('connection', function (socket) {
       })
     })
   })
+  socket.on('begin', (data) => {
+    io.emit('begin', data);
+  })
   socket.on('fill_score', (data) => {
     io.emit('fill_score', data);
   })
   socket.on('next', () => {
     io.emit('next');
   })
-
   socket.on('change_judge_state', (phone) => {
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
       var dbo = db.db('judge');
@@ -92,10 +84,6 @@ io.on('connection', function (socket) {
         db.close();
       })
     })
-  })
-
-  socket.on('begin', (data) => {
-    io.emit('begin',data);
   })
 })
 

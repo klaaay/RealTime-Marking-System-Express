@@ -1,14 +1,16 @@
-//a check interval
-var Interval;
+//check intervals
+var CHECK_TIMEOUT;
+var CHECK_JUDGES_ONLINE;
+
 init_wait_time()
 reset_timer('timer_count span');
+
+var socket = io();
 
 $(document).ready(function () {
 
     $('#projects .project h1').text('等待评委登陆......');
     $('.my-nav button').attr('disabled', true);
-
-    var socket = io();
     socket.on('add_judge', function (data) {
         if (phone_list.indexOf(data.phone) === -1) {
             add_judge(data.phone, data.id);
@@ -16,9 +18,11 @@ $(document).ready(function () {
             user_list[((data.phone).toString())] = data.id;
             // console.log(phone_list);
             // console.log(user_list);
-            if (phone_list.length >= JUDGE_AMOUNT) {
-                $('#projects .project h1').text('所有评委等待就绪');
-                button_switch('init')
+            if (!ALREADY_START) {
+                if (phone_list.length >= JUDGE_AMOUNT) {
+                    $('#projects .project h1').text('所有评委等待就绪');
+                    button_switch('init')
+                }
             }
         }
     })
@@ -35,18 +39,20 @@ $(document).ready(function () {
         var leave_phone = find_key(id);
         phone_list.splice(phone_list.indexOf(leave_phone), 1);
         socket.emit('change_judge_state', leave_phone);
-        remove_judge(id);
+        remove_judge(leave_phone);
     })
 
     $('#init').click((e) => {
         socket.emit('init');
     })
     $('#begin').click((e) => {
-        socket.emit('begin');
+        ALREADY_START = 1;
+        CONTINUE = 0;
         init_wait_time()
         reset_timer('timer_count span');
-        timer();
-        Interval = setInterval(check_timeout, 1000);
+        // timer();
+        CHECK_TIMEOUT = setInterval(check_timeout, 1000);
+        CHECK_JUDGES_ONLINE = setInterval(check_judges_online, 1000);
         button_switch('done');
     })
     $('#done').click((e) => {
@@ -58,7 +64,8 @@ $(document).ready(function () {
     $('#next').click((e) => {
         if (curren_group === groups_info.length) {
             init_wait_time();
-            clearInterval(Interval);
+            window.clearInterval(CHECK_TIMEOUT);
+            window.clearInterval(CHECK_JUDGES_ONLINE);
             button_switch('end');
         } else {
             groups_switch(groups_info, curren_group);
@@ -67,6 +74,11 @@ $(document).ready(function () {
             button_switch('begin');
             socket.emit('next');
         }
+    })
+
+    $('#end').click((e) => {
+        ALREADY_START = 0;
+        console.log(ALREADY_START);
     })
 })
 
@@ -91,8 +103,8 @@ function add_judge(now_phone, id) {
     $('#judges').append($judge);
 }
 
-function remove_judge(id) {
-    $('.' + id).remove();
+function remove_judge(leave_phone) {
+    $('#' + leave_phone).remove();
 }
 
 function button_switch(name) {
@@ -119,11 +131,30 @@ function fill_score(phone, score) {
 
 function check_timeout() {
     //?
-    console.log(1)
+    // console.log(1)
     if (WAIT_TIME) {
     } else {
         $('#done').trigger('click');
         clear_timer();
+    }
+}
+
+function check_judges_online() {
+    //?
+    // console.log(phone_list);
+    if (JUDGE_AMOUNT === phone_list.length) {
+        $('#projects .project h3').text('');
+        clear_timer();
+        reset_timer('timer_count span');
+        if (!CONTINUE) {
+            socket.emit('begin', $('#timer_count').text());
+            timer();
+            CONTINUE = 1;
+        }
+    } else {
+        clear_timer();
+        CONTINUE = 0;
+        $('#projects .project h3').text('有用户断开连接，请耐心等待重新连接...');
     }
 }
 

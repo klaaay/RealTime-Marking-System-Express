@@ -6,6 +6,7 @@
   margin-bottom: 0;
 }
 #projects .project h1,
+#projects .project h3,
 #projects .project p {
   margin-left: 20px;
 }

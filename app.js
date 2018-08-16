@@ -47,7 +47,7 @@ io.on('connection', function (socket) {
             socket.emit('judge_login_sucess', result[0].phone_number);
             dbo.collection("judges").updateOne({ "state": false }, { $set: { "state": true } }, function (err, res) {
               if (err) throw err;
-              console.log("文档更新成功");
+              console.log("update set true success");
               db.close();
             });
           } else {
@@ -76,9 +76,6 @@ io.on('connection', function (socket) {
       })
     })
   })
-  socket.on('begin', () => {
-    io.emit('begin');
-  })
   socket.on('fill_score', (data) => {
     io.emit('fill_score', data);
   })
@@ -95,6 +92,10 @@ io.on('connection', function (socket) {
         db.close();
       })
     })
+  })
+
+  socket.on('begin', (data) => {
+    io.emit('begin',data);
   })
 })
 

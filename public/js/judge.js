@@ -2,18 +2,18 @@ var N = 0;
 var Now_phone;
 var now_id;
 //a check interval
-var c;
-init_wait_time()
+var CHECK_SCORE_FINISH;
+// init_wait_time()
 reset_timer('seconds');
 
 $(document).ready(function () {
     show_log();
     $('i').css('display', 'none');
-    $('.notification').css('display','none');
-    $('body').on('click','.notification button',function(){
-        $('.notification').css('display','none');
+    $('.notification').css('display', 'none');
+    $('body').on('click', '.notification button', function () {
+        $('.notification').css('display', 'none');
     })
-    
+
     var socket = io('http://localhost:3000/');
     socket.on('connect', function () {
         now_id = socket.id;
@@ -25,23 +25,28 @@ $(document).ready(function () {
     // })
     socket.on('judge_login_sucess', function (now_phone) {
         Now_phone = now_phone;
-        $('.notification').css('display','none');
+        $('.notification').css('display', 'none');
         chose_score();
-        socket.emit('add_judge',Now_phone);
+        socket.emit('add_judge', Now_phone);
         show_judge();
     })
     socket.on('judge_login_fail', function (message) {
         show_fail_message(message);
     })
-    socket.on('begin', () => {
-        c = setInterval(check, 500);
+
+    socket.on('begin', (data) => {
+        $('#seconds').text(data);
+        WAIT_TIME = data;
+        CHECK_SCORE_FINISH = setInterval(check_score_finish, 1000);
         timer();
     })
+
     socket.on('next', () => {
         $('svg').css('display', 'none');
         init_wait_time()
         reset_timer('seconds');
         $('#seconds').text(WAIT_TIME);
+        $('.score div').removeClass('marked');
         $('#commit_btn').attr("disabled", true);
     })
 
@@ -77,7 +82,7 @@ function chose_score() {
     })
 }
 
-function check() {
+function check_score_finish() {
     var $array = $('.score').find('.marked');
     var array = Array.prototype.slice.call($array);
     var n = array.length;
@@ -88,12 +93,12 @@ function check() {
         $('#commit_btn').attr("disabled", true);
     }
     if (N >= 5) {
-        clearInterval(c);
+        clearInterval(CHECK_SCORE_FINISH);
         $('#commit_btn').click(judge_result);
     }
     if (WAIT_TIME === 0) {
         $('#commit_btn').trigger('click');
-        clearInterval(c);
+        clearInterval(CHECK_SCORE_FINISH);
     }
 }
 
@@ -130,7 +135,7 @@ function judger_login(socket) {
     socket.emit('check_judge_login', phone_number);
 }
 
-function show_fail_message(message){
-    $('.notification ').css('display','flex');
+function show_fail_message(message) {
+    $('.notification ').css('display', 'flex');
     $('.notification span').text(message);
 }

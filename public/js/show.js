@@ -71,7 +71,7 @@ $(document).ready(function () {
             window.clearInterval(CHECK_TIMEOUT);
             window.clearInterval(CHECK_JUDGES_ONLINE);
             button_switch('end');
-            socket.emit('groups_result',groups_result);
+            socket.emit('groups_result', groups_result);
         } else {
             groups_switch(groups_info, curren_group);
 
@@ -126,7 +126,7 @@ function button_switch(name) {
 function groups_switch(groups, index) {
     if (groups.length >= (index + 1)) {
         $('#projects .project h1').text(groups[index].project_name);
-        $('#projects .project p').text( groups[index].group_leader+'/'+groups[index].group_member.reduce((acc, cur) => {
+        $('#projects .project p').text(groups[index].group_leader + '/' + groups[index].group_member.reduce((acc, cur) => {
             return acc + '/' + cur;
         }));
     }
@@ -157,10 +157,12 @@ function check_judges_online() {
         $('#projects .project h3').text('');
         clear_timer();
         reset_timer('timer_count span');
-        if (!CONTINUE) {
-            socket.emit('begin', $('#timer_count').text());
-            timer();
-            CONTINUE = 1;
+        if ($('#begin').attr('disabled')) {
+            if (!CONTINUE) {
+                socket.emit('begin', $('#timer_count').text());
+                timer();
+                CONTINUE = 1;
+            }
         }
     } else {
         clear_timer();

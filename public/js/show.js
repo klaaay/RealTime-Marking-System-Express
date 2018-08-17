@@ -58,18 +58,27 @@ $(document).ready(function () {
     $('#done').click((e) => {
         clear_timer();
         CONTINUE = 1;
+        clear_timer();
+
         show_total();
         calcu_total();
         button_switch('next');
     })
     $('#next').click((e) => {
+        get_judges_result();
         if (curren_group === groups_info.length) {
             init_wait_time();
             window.clearInterval(CHECK_TIMEOUT);
             window.clearInterval(CHECK_JUDGES_ONLINE);
             button_switch('end');
+            socket.emit('groups_result',groups_result);
         } else {
             groups_switch(groups_info, curren_group);
+
+            clear_timer();
+            CONTINUE = 1;
+            clear_timer();
+
             init_wait_time();
             all_zero();
             button_switch('begin');
@@ -80,6 +89,7 @@ $(document).ready(function () {
     $('#end').click((e) => {
         ALREADY_START = 0;
         console.log(ALREADY_START);
+        console.log(groups_result);
     })
 })
 
@@ -87,18 +97,18 @@ function add_judge(now_phone, id) {
     var $judge = $('<div id="' + now_phone + '" class="judge ' + id + '"></div>');
     var $list_group = $('<ul class="list-group"></ul>');
     var $head = $('<li id="head" class="list-group-item list-group-item-success head">' + id.slice(0, 5) + '</li>');
-    var $live = $('<li class="list-group-item"><span class="badge">0</span>答辩</li>');
-    var $interface = $('<li class="list-group-item"><span class="badge">0</span>界面</li>');
-    var $func = $('<li class="list-group-item"><span class="badge">0</span>功能</li>');
-    var $code = $('<li class="list-group-item"><span class="badge">0</span>代码</li>');
-    var $group = $('<li class="list-group-item"><span class="badge">0</span>团队</li>');
+    var $show = $('<li class="list-group-item"><span class="badge show">0</span>答辩</li>');
+    var $face = $('<li class="list-group-item"><span class="badge face">0</span>界面</li>');
+    var $function = $('<li class="list-group-item"><span class="badge function">0</span>功能</li>');
+    var $code = $('<li class="list-group-item"><span class="badge code">0</span>代码</li>');
+    var $team = $('<li class="list-group-item"><span class="badge team">0</span>团队</li>');
     var $total = $('<li class="list-group-item"><span class="badge total">0</span>总计</li>');
     $list_group.append($head);
-    $list_group.append($live);
-    $list_group.append($interface);
-    $list_group.append($func);
+    $list_group.append($show);
+    $list_group.append($face);
+    $list_group.append($function);
     $list_group.append($code);
-    $list_group.append($group);
+    $list_group.append($team);
     $list_group.append($total);
     $judge.append($list_group);
     $('#judges').append($judge);
@@ -116,8 +126,8 @@ function button_switch(name) {
 function groups_switch(groups, index) {
     if (groups.length >= (index + 1)) {
         $('#projects .project h1').text(groups[index].project_name);
-        $('#projects .project p').text(groups[index].group_member.reduce((acc, cur) => {
-            return acc.member_name + '/' + cur.member_name;
+        $('#projects .project p').text( groups[index].group_leader+'/'+groups[index].group_member.reduce((acc, cur) => {
+            return acc + '/' + cur;
         }));
     }
     curren_group = curren_group + 1;
@@ -183,7 +193,7 @@ function calcu_pre_total(divide, score) {
 function calcu_total() {
     var result = [];
     var sum = 0;
-    $arry = $('.judge .total');
+    var $arry = $('.judge .total');
     for (var i = 0; i < $arry.length; i++) {
         result.push($($arry[i]).text());
         sum += parseInt(($($arry[i]).text()));
@@ -204,4 +214,26 @@ function find_key(id) {
         }
     }
     return -1;
+}
+
+function get_judges_result() {
+    var judges_result = new Array;
+    var $arry = $('.judge');
+    for (var i = 0; i < $arry.length; i++) {
+        judge_result["phone"] = $($arry[i]).attr('id');
+        var $span = $($arry[i]).find('span');
+        for (var j = 0; j < $span.length; j++) {
+            judge_result[stand[j]] = $($span[j]).text();
+
+        }
+        judges_result.push(judge_result);
+        judge_result = new Object;
+    }
+    group_result["project_name"] = $('#projects .project h1').text();
+    group_result["group_leader"] = $('#projects .project p').text().toString().split('/')[0];
+    group_result["group_member"] = $('#projects .project p').text().toString().split('/').slice(1);
+    group_result["judges_result"] = judges_result;
+    group_result["score"] = $('#projects .score h1').text();
+    groups_result.push(group_result);
+    group_result = new Object;
 }

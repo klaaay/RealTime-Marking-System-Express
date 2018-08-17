@@ -6,7 +6,8 @@ const routes = require('./routes');
 const server = require('http').createServer(app);
 var io = require('socket.io')(server);
 const MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:27017/";
+var url = require('./config/data.js').mogo_url;
+var PORT = require('./config/data.js').port;
 var console = require('tracer').colorConsole();
 
 app.set('views', path.join(__dirname, 'views'))
@@ -81,8 +82,18 @@ io.on('connection', function (socket) {
       })
     })
   })
+  socket.on('groups_result', (groups_result) => {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
+      var dbo = db.db('judge');
+      dbo.collection('groups_result').insertMany(groups_result, function (err, result) {
+        if(err) throw err;
+        console.log("insert: " + result.insertedCount + " results");
+        db.close();
+      })
+    })
+  })
 })
 
-server.listen(3000, function () {
-  console.log(`${pkg.name} listened on 3000`)
+server.listen(PORT, function () {
+  console.log(`${pkg.name} listened on ${PORT}`)
 })

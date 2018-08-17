@@ -12,13 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "connect-flash": "^0.1.1",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
-    "express-formidable": "^1.0.0",
-    "express-session": "^1.15.6",
     "mongodb": "^3.1.1",
-    "socket.io": "^2.1.1",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {
     "tracer": "^0.9.1"
   }
 }

@@ -3,14 +3,10 @@ const express = require('express')
 const pkg = require('./package')
 const app = express()
 const routes = require('./routes');
-
-
 const server = require('http').createServer(app);
 var io = require('socket.io')(server);
-
 const MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/";
-
 var console = require('tracer').colorConsole();
 
 app.set('views', path.join(__dirname, 'views'))
